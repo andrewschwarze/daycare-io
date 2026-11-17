@@ -1,0 +1,15 @@
+name = "daycare-attendance"
+main = "src/index.ts"
+compatibility_date = "2026-11-16"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "daycare-attendance-local"
+# Local-only placeholder. Replace with a database created in the provider's account before any remote use.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"

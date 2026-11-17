@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f8f5" />
+    <meta name="description" content="Private daycare attendance application." />
+    <title>Little Pines · Attendance</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/overrides.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Little Pines attendance home">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>Little Pines <small>daycare attendance</small></span>
+      </a>
+      <div class="header-right">
+        <span class="secure-badge"><span></span> Private attendance</span>
+        <button class="mode-toggle hidden" id="logout-button" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="auth-view" class="view hidden">
+        <div class="auth-card">
+          <p class="eyebrow">LITTLE PINES DAYCARE</p>
+          <h1 id="auth-title">Welcome back</h1>
+          <p class="subhead" id="auth-subtitle">Sign in to manage attendance.</p>
+          <form id="login-form" class="stack-form">
+            <label>Email address<input name="email" type="email" autocomplete="username" required /></label>
+            <label>Password<input name="password" type="password" autocomplete="current-password" required minlength="12" /></label>
+            <button class="primary-button" type="submit">Sign in</button>
+          </form>
+          <form id="setup-form" class="stack-form hidden">
+            <label>One-time setup code<input name="setupSecret" type="password" autocomplete="off" required /></label>
+            <label>Provider name<input name="name" autocomplete="name" required maxlength="120" /></label>
+            <label>Email address<input name="email" type="email" autocomplete="email" required /></label>
+            <label>Create password<input name="password" type="password" autocomplete="new-password" required minlength="12" /></label>
+            <p class="form-help">Use a unique password with at least 12 characters. The setup code comes from your local development configuration.</p>
+            <button class="primary-button" type="submit">Create provider account</button>
+          </form>
+          <p id="auth-error" class="form-error hidden" role="alert"></p>
+        </div>
+      </section>
+
+      <section id="password-view" class="view hidden">
+        <div class="auth-card">
+          <p class="eyebrow">SECURE YOUR ACCOUNT</p>
+          <h1>Choose a new password</h1>
+          <p class="subhead">Change your temporary password before continuing.</p>
+          <form id="password-form" class="stack-form">
+            <label>Temporary password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+            <label>New password<input name="newPassword" type="password" autocomplete="new-password" required minlength="12" /></label>
+            <button class="primary-button" type="submit">Save new password</button>
+          </form>
+          <p id="password-error" class="form-error hidden" role="alert"></p>
+        </div>
+      </section>
+
+      <section id="parent-view" class="view hidden">
+        <div class="welcome-row">
+          <div><p class="eyebrow" id="today-label"></p><h1 id="parent-greeting">Good morning</h1><p class="subhead">Choose which children you’re checking in or out.</p></div>
+          <div class="weather-chip"><span>Secure portal</span></div>
+        </div>
+        <div class="guardian-card"><span class="avatar avatar-purple" id="parent-avatar">GU</span><div><strong id="parent-name"></strong><small>Authorized adult</small></div><span class="lock-icon" aria-hidden="true">✓</span></div>
+        <form id="attendance-form">
+          <div class="section-heading"><div><h2>Children in your care</h2><p>Attendance is recorded when you submit.</p></div><button class="text-button" id="select-all" type="button">Select all</button></div>
+          <div class="child-list" id="child-list" aria-label="Authorized children"></div>
+          <div class="attendance-footer"><p id="action-hint" class="muted">Select a child to continue.</p><button class="primary-button" id="attendance-action" type="submit" disabled>Sign in selected</button></div>
+        </form>
+      </section>
+
+      <section id="provider-view" class="view hidden">
+        <div class="welcome-row">
+          <div><p class="eyebrow">PROVIDER DASHBOARD</p><h1 id="provider-greeting">Attendance overview</h1><p class="subhead">Manage children, guardians, and attendance.</p></div>
+          <div class="provider-actions"><button class="outline-button" id="print-button" type="button">Print report</button><a class="outline-button link-button" href="/api/export.csv" id="export-button">↓ CSV</a></div>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon mint">✓</span><strong id="present-count">0</strong><small>Present now</small></article>
+          <article class="stat-card"><span class="stat-icon peach">↗</span><strong id="arrival-count">0</strong><small>Arrivals today</small></article>
+          <article class="stat-card"><span class="stat-icon lavender">◷</span><strong id="missing-count">0</strong><small>Open sessions</small></article>
+        </div>
+
+        <div class="dashboard-card share-card"><div><h2>Shared parent check-in link</h2><p>Use this URL when creating the daycare’s shared QR code. It contains no child information.</p><code id="parent-entry-url"></code></div><button class="outline-button" id="copy-parent-link" type="button">Copy link</button></div>
+
+        <div class="dashboard-card">
+          <div class="section-heading"><div><h2>Children</h2><p>Current attendance status</p></div></div>
+          <form id="add-child-form" class="inline-form"><input name="firstName" aria-label="Child first name" placeholder="First name" required maxlength="80" /><input name="lastName" aria-label="Child last name" placeholder="Last name" required maxlength="80" /><button class="small-button" type="submit">Add child</button></form>
+          <div id="provider-roster" class="provider-roster"></div>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="section-heading"><div><h2>Authorized guardians</h2><p>Each adult gets an individual account.</p></div></div>
+          <form id="add-guardian-form" class="stack-form compact-form">
+            <div class="form-grid"><label>Adult’s name<input name="name" required maxlength="120" /></label><label>Email address<input name="email" type="email" required maxlength="254" /></label></div>
+            <fieldset><legend>Children they may manage</legend><div id="child-access-options" class="checkbox-grid"></div></fieldset>
+            <button class="small-button" type="submit">Add guardian</button>
+          </form>
+          <div id="guardian-list" class="provider-roster"></div>
+        </div>
+
+        <div class="dashboard-card" id="history-card">
+          <div class="section-heading"><div><h2>Recent attendance</h2><p>Times are shown in Central Time. Original events remain in the audit history.</p></div></div>
+          <div id="activity-list" class="activity-list"></div>
+        </div>
+      </section>
+
+      <dialog id="correction-dialog" class="correction-dialog">
+        <form id="correction-form" class="stack-form">
+          <div class="section-heading"><div><h2>Correct attendance</h2><p>The original event will remain in the audit history.</p></div><button class="text-button" id="close-correction" type="button">Close</button></div>
+          <input type="hidden" name="eventId" />
+          <label>Correction type<select name="kind"><option value="replace">Replace event details</option><option value="void">Void this event</option></select></label>
+          <div id="replacement-fields" class="stack-form compact-form">
+            <label>Child<select name="childId" required></select></label>
+            <label>Guardian<select name="guardianId" required></select></label>
+            <label>Action<select name="action"><option value="sign_in">Sign in</option><option value="sign_out">Sign out</option></select></label>
+            <label>Time in Central Time<input name="occurredAt" type="datetime-local" required /></label>
+          </div>
+          <label>Reason for correction<textarea name="reason" required maxlength="1000" rows="3"></textarea></label>
+          <button class="primary-button" type="submit">Save correction</button>
+        </form>
+      </dialog>
+      <dialog id="temporary-password-dialog" class="correction-dialog">
+        <div class="stack-form"><div><p class="eyebrow">ONE-TIME DISPLAY</p><h2>Guardian account created</h2></div><p class="form-help">Share this temporary password privately. It will not be shown again, and the guardian must change it on first sign-in.</p><code id="temporary-password"></code><div class="dialog-actions"><button class="outline-button" id="copy-temporary-password" type="button">Copy password</button><button class="primary-button" id="close-temporary-password" type="button">Done</button></div></div>
+      </dialog>
+
+      <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <footer><span>Little Pines daycare attendance</span><span>Times displayed in America/Chicago</span></footer>
+  </body>
+</html>
