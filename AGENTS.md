@@ -14,15 +14,18 @@
 - Validate all input and enforce authorization in server-side Worker handlers. The browser is not an authorization boundary.
 - Store timestamps as UTC ISO-8601 values. Convert to `America/Chicago` only for display and reports.
 - Keep attendance events and correction records append-only. Never overwrite or silently remove historical attendance. Corrections require a reason and the authenticated actor.
-- Use soft deactivation for children and guardians. Do not cascade-delete attendance history.
+- Use soft deactivation for children and families. Do not cascade-delete attendance history.
 - Avoid external services unless a specific requirement cannot be met with Cloudflare and a provider-owned account. Document any such dependency and its recurring cost.
 
 ## Security and privacy
 
 - Never store plaintext passwords, PINs, session tokens, or recovery codes. Store only appropriately derived credential hashes or token digests.
+- Families authenticate with one shared six-digit PIN; verify PINs server-side using a unique salt and derived hash, and protect guessing with IP rate limits and unique generated PINs.
+- The provider retains a strong password and a one-time recovery phrase. Never reuse the setup secret for ongoing recovery.
+- Family sessions last up to 30 days. Provider sessions use a 12-hour idle timeout with a 30-day absolute maximum. Keep server-side revocation and trusted-device controls.
 - Use secure, HTTP-only, SameSite cookies for sessions; enforce CSRF protection for state-changing cookie-authenticated requests.
 - Add server-side rate limits to authentication and sensitive actions. Return generic authentication errors and avoid logging names, credentials, session tokens, or attendance details.
-- Check the session, role, active state, and guardian-child relationship on every protected request. Do not trust child IDs sent by the browser.
+- Check the session, role, active state, and family-child relationship on every protected request. Do not trust child IDs sent by the browser.
 - Keep children's information out of QR codes, URLs, analytics, and error messages.
 - Use least-privilege account access, encrypted transport, and protected backups. Document backup restoration and account recovery.
 - Keep local development data fictional and never represent the development database as production-safe.
