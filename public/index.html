@@ -4,17 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f8f5" />
-    <meta name="description" content="Private attendance for Megan's Daycare." />
-    <title>Megan's Daycare Attendance</title>
+    <meta name="description" content="Private attendance for Megan's Childcare." />
+    <title>Megan's Childcare Attendance</title>
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/overrides.css" />
     <script src="/app.js" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/" aria-label="Megan's Daycare attendance home">
+      <a class="brand" href="/" aria-label="Megan's Childcare attendance home">
         <span class="brand-mark" aria-hidden="true">✳</span>
-        <span>Megan's Daycare <small>attendance</small></span>
+        <span>Megan's Childcare <small>attendance</small></span>
       </a>
       <div class="header-right">
         <span class="secure-badge"><span></span> Private attendance</span>
@@ -25,7 +25,7 @@
     <main>
       <section id="auth-view" class="view hidden">
         <div class="auth-card">
-          <p class="eyebrow">MEGAN'S DAYCARE</p>
+          <p class="eyebrow">MEGAN'S CHILDCARE</p>
           <h1 id="auth-title">Welcome back</h1>
           <p class="subhead" id="auth-subtitle">Sign in to manage attendance.</p>
           <form id="family-login-form" class="stack-form">
@@ -52,7 +52,7 @@
             <label>Provider name<input name="name" autocomplete="name" required maxlength="120" /></label>
             <label>Email address<input name="email" type="email" autocomplete="email" required /></label>
             <label>Create password<input name="password" type="password" autocomplete="new-password" required minlength="12" /></label>
-            <p class="form-help">Use a unique password or phrase with at least 12 characters. No symbols or uppercase letters are required. The setup code comes from your local development configuration.</p>
+            <p class="form-help">Use a unique password or phrase with at least 12 characters. No symbols or uppercase letters are required. For a deployed site, the one-time code is the Cloudflare Worker secret named SETUP_SECRET. For local development, use the value in .dev.vars. The password you create here is what you use to sign in later.</p>
             <button class="primary-button" type="submit">Create provider account</button>
           </form>
           <p id="auth-error" class="form-error hidden" role="alert"></p>
@@ -83,7 +83,7 @@
           <article class="stat-card"><span class="stat-icon lavender">◷</span><strong id="missing-count">0</strong><small>Open sessions</small></article>
         </div>
 
-        <div class="dashboard-card share-card"><div><h2>Shared parent check-in link</h2><p>Use this URL when creating the daycare’s shared QR code. It contains no child information.</p><code id="parent-entry-url"></code></div><button class="outline-button" id="copy-parent-link" type="button">Copy link</button></div>
+        <div class="dashboard-card share-card"><div><h2>Shared parent check-in link</h2><p>Use this URL when creating the childcare’s shared QR code. It contains no child information.</p><code id="parent-entry-url"></code></div><button class="outline-button" id="copy-parent-link" type="button">Copy link</button></div>
 
         <div class="dashboard-card">
           <div class="section-heading"><div><h2>Provider guides</h2><p>Download everyday instructions or technical operations steps.</p></div></div>
@@ -142,6 +142,6 @@
 
       <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
     </main>
-    <footer><span>Megan's Daycare attendance</span><span>Times displayed in America/Chicago</span></footer>
+    <footer><span>Megan's Childcare attendance</span><span>Times displayed in America/Chicago</span></footer>
   </body>
 </html>

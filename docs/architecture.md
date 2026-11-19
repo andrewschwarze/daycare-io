@@ -20,7 +20,7 @@ Cloudflare D1 (accounts, relationships, attendance, audit trail)
 
 The QR code points to a shared, non-secret app URL only. It contains no child, family, or attendance identifiers. A family enters its shared six-digit PIN; the server resolves only that family's active children and stamps attendance using server time. A family request must never be allowed to select an arbitrary child or actor.
 
-For portability, account ownership, the Cloudflare zone, Worker, D1 database, and backup credentials belong to the daycare provider. Avoid developer-owned integrations and hardcoded account identifiers. Current free-tier quotas should be checked during handoff; do not promise permanent $0 hosting.
+For portability, account ownership, the Cloudflare zone, Worker, D1 database, and backup credentials belong to the childcare provider. Avoid developer-owned integrations and hardcoded account identifiers. Current free-tier quotas should be checked during handoff; do not promise permanent $0 hosting.
 
 ## Initial database schema
 
@@ -49,7 +49,7 @@ The event stream stores every sign-in/out action rather than overwriting a daily
 
 ## Security decisions to validate during implementation
 
-- Use Web Crypto PBKDF2 with per-credential salts and high-entropy opaque session cookies. Store only credential hashes and token digests. Family PINs are six digits; rate limits, unique PIN generation, and device revocation mitigate online guessing and compromise risk.
+- Use Web Crypto PBKDF2-SHA256 with per-credential salts and high-entropy opaque session cookies. Cloudflare Workers rejects PBKDF2 iteration counts above 100,000, so the current derivation uses that ceiling; review this platform constraint and the password-hashing choice during the pre-launch security review. Store only credential hashes and token digests. Family PINs are six digits; rate limits, unique PIN generation, and device revocation mitigate online guessing and compromise risk.
 - Set session cookies `Secure`, `HttpOnly`, and `SameSite`; expire sessions and support revocation. Add CSRF defenses for cookie-authenticated writes.
 - Rate-limit family PIN guessing and provider login/recovery in D1; apply IP and account limits where applicable. Use generic login failure responses and avoid sensitive logs.
 - Validate and authorize every request server-side. Family access is restricted by current active family-child links; provider operations require provider role.
@@ -69,6 +69,6 @@ CCAP compliance and electronic attendance submission are not project requirement
 3. **Attendance (initial implementation):** server-timestamped sign-in/out events, sibling flow, current-presence projection, idempotency keys, and append-only corrections with reason and actor.
 4. **Provider workflows (initial implementation):** child/family add, edit and deactivation, family-child management, latest-500 attendance history, CSV export, and print view. Add filters and pagination before relying on long-term exports.
 5. **Operational readiness (partially implemented):** the provider can generate/reset family PINs and revoke family devices. Provider recovery phrases and trusted-session lifetimes are implemented. A provider who loses both the password and recovery phrase still has no in-app recovery path. Configurable retention, encrypted provider-owned backups and a restore drill, developer access revocation, and accessibility and security review remain outstanding.
-6. **Launch readiness:** complete the operational work, transfer all infrastructure to the daycare-owned Cloudflare account, and review both provider guides with the provider. Word copies are served from authenticated provider-only download routes.
+6. **Launch readiness:** complete the operational work, transfer all infrastructure to the childcare-owned Cloudflare account, and review both provider guides with the provider. Word copies are served from authenticated provider-only download routes.
 
 No production infrastructure or public deployment is created by this project setup.

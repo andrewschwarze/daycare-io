@@ -1,6 +1,6 @@
 # Provider Guide
 
-Megan's Daycare  
+Megan's Childcare
 Everyday tasks  
 Updated November 2026
 
@@ -26,7 +26,7 @@ Use this guide to find common provider tasks. Choose a topic below to jump to it
 
 For provider access, choose **Provider sign in**, then enter the provider email and password. Families enter their shared six-digit PIN on the family sign-in screen. A family can stay signed in on a trusted phone for up to 30 days. Use **Sign out** when finished, especially on a shared phone.
 
-Keep the provider password in a password manager controlled by the daycare. Do not share this login with families. Each family should receive its own PIN privately.
+Keep the provider password in a password manager controlled by the childcare program. Do not share this login with families. Each family should receive its own PIN privately.
 
 ## I want to see who is here
 
@@ -68,7 +68,7 @@ Choose **Correct** beside the event. Replace the details that are wrong, or choo
 
 ## I want to download or print attendance
 
-Choose **Download CSV** for the full attendance history. Choose **Print report** for a printable view of recent events. The CSV is sensitive: keep it on a device controlled by the daycare and protected with device encryption. Do not email it to a group or put it in a public folder.
+Choose **Download CSV** for the full attendance history. Choose **Print report** for a printable view of recent events. The CSV is sensitive: keep it on a device controlled by the childcare program and protected with device encryption. Do not email it to a group or put it in a public folder.
 
 The CSV is an app export, not a complete database backup or a state submission form. Times in the CSV are UTC; the printable view shows Central Time.
 
@@ -84,17 +84,17 @@ During initial setup, save the provider recovery phrase somewhere secure and sep
 
 If you forget the provider password, choose **Provider sign in**, then **I need to recover provider access**. Enter the saved recovery phrase and choose a new password. Save and acknowledge the replacement phrase before continuing. A previous one-time recovery code can be used during transition until the new phrase is acknowledged.
 
-If you lose both the provider password and recovery phrase, there is no in-app recovery path. Use the secure paper attendance process and contact the daycare's authorized technical operator. Do not edit credentials directly in the database.
+If you lose both the provider password and recovery phrase, there is no in-app recovery path. Use the secure paper attendance process and contact the childcare program's authorized technical operator. Do not edit credentials directly in the database.
 
 ## I want to take attendance during an outage
 
-If the app or internet is unavailable, use the daycare's secure paper attendance process. Write the child, family/adult, sign-in or sign-out, actual time, and the person recording it. Keep the sheet out of public view. Do not put attendance details in a phone notes app or text message.
+If the app or internet is unavailable, use the childcare program's secure paper attendance process. Write the child, family/adult, sign-in or sign-out, actual time, and the person recording it. Keep the sheet out of public view. Do not put attendance details in a phone notes app or text message.
 
-When the app is working again, enter missing events as the provider and say they came from the outage log. Keep the paper sheet with the daycare's protected records.
+When the app is working again, enter missing events as the provider and say they came from the outage log. Keep the paper sheet with the childcare program's protected records.
 
 ## I want to make or restore a backup
 
-**Download CSV** is not a full backup. Full backups and restores require a technical helper and Cloudflare access. Follow the Technical Provider Guide. Backup files contain private information and must be encrypted and stored under the daycare's control.
+**Download CSV** is not a full backup. Full backups and restores require a technical helper and Cloudflare access. Follow the Technical Provider Guide. Backup files contain private information and must be encrypted and stored under the childcare program's control.
 
 Do not try a restore yourself. Restoring can replace attendance and account data. Ask the authorized technical operator to confirm the database and restore point first.
 

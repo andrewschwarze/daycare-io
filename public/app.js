@@ -50,7 +50,7 @@ function showAuth(setupRequired = false, error = "") {
   ["#family-login-form", "#provider-login-form", "#provider-recovery-form", "#setup-form"].forEach((selector) => $(selector).classList.add("hidden"));
   $(setupRequired ? "#setup-form" : "#family-login-form").classList.remove("hidden");
   $("#auth-title").textContent = setupRequired ? "Set up provider account" : "Welcome back";
-  $("#auth-subtitle").textContent = setupRequired ? "Create the provider's sign-in for this daycare." : "Enter your family's six-digit PIN.";
+  $("#auth-subtitle").textContent = setupRequired ? "Create the provider's sign-in for this childcare." : "Enter your family's six-digit PIN.";
   $("#auth-error").textContent = error;
   $("#auth-error").classList.toggle("hidden", !error);
   setView("auth-view");
@@ -145,7 +145,7 @@ function renderParent() {
       <button class="child-card ${state.selected.has(child.id) ? "selected" : ""}" type="button" data-child-id="${escapeHtml(child.id)}" aria-pressed="${state.selected.has(child.id)}">
         <span class="avatar ${avatarClass(child.first_name)}">${escapeHtml(initials(`${child.first_name} ${child.last_name}`))}</span>
         <span class="child-meta"><strong>${escapeHtml(child.first_name)} ${escapeHtml(child.last_name)}</strong><small>${child.present ? `Checked in ${escapeHtml(formatTime(child.last_event_at_utc))}` : "Not checked in yet"}</small></span>
-        <span class="status ${child.present ? "status-present" : "status-home"}">${child.present ? "At daycare" : "Not checked in"}</span>
+        <span class="status ${child.present ? "status-present" : "status-home"}">${child.present ? "At childcare" : "Not checked in"}</span>
         <span class="check-box" aria-hidden="true">${state.selected.has(child.id) ? "✓" : ""}</span>
       </button>`).join("");
     list.querySelectorAll("[data-child-id]").forEach((button) => button.addEventListener("click", () => {

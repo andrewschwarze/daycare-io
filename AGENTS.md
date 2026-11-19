@@ -2,9 +2,9 @@
 
 ## Product scope
 
-- Build for one licensed in-home daycare in Minnesota. Keep routine provider administration in the application.
+- Build for one licensed in-home childcare program in Minnesota. Keep routine provider administration in the application.
 - Keep the design mobile-first, accessible, and understandable by a nontechnical provider.
-- Keep the deployment portable to a Cloudflare account owned by the daycare provider. Never bake in developer account IDs, tokens, or credentials.
+- Keep the deployment portable to a Cloudflare account owned by the childcare provider. Never bake in developer account IDs, tokens, or credentials.
 - Use fictional children and adults in source, documentation, screenshots, and local fixtures. Never copy real attendance or family information into development.
 - Do not add CCAP-specific workflows or claim state-program compliance; CCAP reporting is outside this project's scope.
 

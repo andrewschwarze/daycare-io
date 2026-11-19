@@ -39,7 +39,8 @@ interface CredentialRow {
 const PROVIDER_IDLE_SECONDS = 12 * 60 * 60;
 const PROVIDER_MAX_SESSION_SECONDS = 30 * 24 * 60 * 60;
 const FAMILY_SESSION_SECONDS = 30 * 24 * 60 * 60;
-const PBKDF2_ITERATIONS = 310_000;
+// Cloudflare Workers WebCrypto rejects PBKDF2 iteration counts above 100,000.
+const PBKDF2_ITERATIONS = 100_000;
 const RECOVERY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const encoder = new TextEncoder();
 
@@ -227,11 +228,15 @@ async function verifyStoredSecret(row: CredentialRow, secret: string): Promise<b
   let params: { iterations?: number };
   try { params = JSON.parse(row.kdf_parameters_json) as { iterations?: number }; } catch { return false; }
   if (!Number.isInteger(params.iterations) || params.iterations! < 100_000 || params.iterations! > 2_000_000) return false;
-  const key = await crypto.subtle.importKey("raw", encoder.encode(secret), "PBKDF2", false, ["deriveBits"]);
-  const actual = new Uint8Array(await crypto.subtle.deriveBits(
-    { name: "PBKDF2", hash: "SHA-256", salt: fromBase64(row.salt), iterations: params.iterations! }, key, 256,
-  ));
-  return constantTimeEqual(actual, fromBase64(row.password_hash));
+  try {
+    const key = await crypto.subtle.importKey("raw", encoder.encode(secret), "PBKDF2", false, ["deriveBits"]);
+    const actual = new Uint8Array(await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: fromBase64(row.salt), iterations: params.iterations! }, key, 256,
+    ));
+    return constantTimeEqual(actual, fromBase64(row.password_hash));
+  } catch {
+    return false;
+  }
 }
 
 function cookies(request: Request): Map<string, string> {
@@ -600,7 +605,7 @@ async function requireFamilyChild(db: D1Database, familyId: string, childId: str
 }
 
 async function setup(request: Request, env: Env): Promise<Response> {
-  if (!env.SETUP_SECRET) fail(503, "Local setup is not configured. See the setup instructions.");
+  if (!env.SETUP_SECRET) fail(503, "Setup is not configured. See the setup instructions.");
   const body = await bodyJson<{ setupSecret: string; email: string; name: string; password: string }>(request);
   const ip = request.headers.get("CF-Connecting-IP") || "local";
   if (await rateLimit(env.DB, `first-provider-setup:${ip}`)) fail(429, "Setup is temporarily unavailable. Wait 15 minutes and try again.");
@@ -616,22 +621,46 @@ async function setup(request: Request, env: Env): Promise<Response> {
   const name = requiredText(body.name, "name");
   const password = validatePassword(body.password);
   const userId = crypto.randomUUID();
-  const now = new Date().toISOString();
+  const nowDate = new Date();
+  const now = nowDate.toISOString();
+  const passwordSalt = randomBytes(16);
+  const passwordDigest = await passwordHash(password, passwordSalt);
+  const recoveryPhraseValue = recoveryPhrase();
+  const recoverySalt = randomBytes(16);
+  const recoveryDigest = await passwordHash(recoveryPhraseValue, recoverySalt);
+  const pair = { token: base64Url(randomBytes(32)), csrf: base64Url(randomBytes(32)) };
+  const sessionTokenDigest = await digest(pair.token);
+  const sessionCsrfDigest = await digest(pair.csrf);
+  const providerSession = sessionDurations("provider");
+  const sessionExpires = new Date(nowDate.getTime() + providerSession.idleSeconds * 1000).toISOString();
+  const sessionAbsoluteExpires = new Date(nowDate.getTime() + providerSession.absoluteSeconds * 1000).toISOString();
   try {
-    await env.DB.prepare(`INSERT INTO users (id, role, display_name, email_normalized, created_at_utc)
-      VALUES (?, 'provider', ?, ?, ?)`)
-      .bind(userId, name, email, now).run();
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO users (id, role, display_name, email_normalized, created_at_utc)
+        VALUES (?, 'provider', ?, ?, ?)`)
+        .bind(userId, name, email, now),
+      env.DB.prepare(`INSERT INTO credentials
+        (user_id, password_hash, salt, kdf_name, kdf_parameters_json, updated_at_utc)
+        VALUES (?, ?, ?, 'PBKDF2-SHA256', ?, ?)`)
+        .bind(userId, toBase64(passwordDigest), toBase64(passwordSalt), JSON.stringify({ iterations: PBKDF2_ITERATIONS }), now),
+      env.DB.prepare(`INSERT INTO provider_recovery
+        (user_id, phrase_hash, salt, kdf_name, kdf_parameters_json, updated_at_utc, acknowledged_at_utc)
+        VALUES (?, ?, ?, 'PBKDF2-SHA256', ?, ?, NULL)`)
+        .bind(userId, toBase64(recoveryDigest), toBase64(recoverySalt), JSON.stringify({ iterations: PBKDF2_ITERATIONS }), now),
+      env.DB.prepare(`INSERT INTO security_audit_events (id, actor_user_id, subject_user_id, event_type, created_at_utc)
+        VALUES (?, ?, ?, 'provider_initialized', ?)`)
+        .bind(crypto.randomUUID(), userId, userId, now),
+      env.DB.prepare(`INSERT INTO sessions
+        (token_digest, csrf_digest, user_id, family_id, created_at_utc, expires_at_utc, absolute_expires_at_utc)
+        VALUES (?, ?, ?, NULL, ?, ?, ?)`)
+        .bind(sessionTokenDigest, sessionCsrfDigest, userId, now, sessionExpires, sessionAbsoluteExpires),
+    ]);
   } catch (error) {
     if (/UNIQUE constraint failed:\s*users\.role/i.test(error instanceof Error ? error.message : "")) {
       fail(409, "The provider account is already set up.");
     }
     throw error;
   }
-  await saveCredential(env.DB, userId, password, now);
-  const recoveryPhraseValue = await storeProviderRecoveryPhrase(env.DB, userId);
-  await env.DB.prepare(`INSERT INTO security_audit_events (id, actor_user_id, subject_user_id, event_type, created_at_utc)
-    VALUES (?, ?, ?, 'provider_initialized', ?)`).bind(crypto.randomUUID(), userId, userId, now).run();
-  const pair = await createSession(env.DB, userId, "provider");
   return json({ ok: true, user: { id: userId, name, role: "provider", recoveryAcknowledgementRequired: true }, recoveryPhrase: recoveryPhraseValue }, 201, sessionHeaders(pair, "provider"));
 }
 

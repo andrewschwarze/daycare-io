@@ -1,8 +1,8 @@
 {
-  "name": "daycare-attendance",
+  "name": "childcare-attendance",
   "private": true,
   "version": "0.1.0",
-  "description": "Local-first starter for a Minnesota in-home daycare attendance app",
+  "description": "Local-first starter for a Minnesota in-home childcare attendance app",
   "scripts": {
     "dev": "wrangler dev",
     "typecheck": "tsc --noEmit"

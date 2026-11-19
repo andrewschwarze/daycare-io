@@ -1,10 +1,10 @@
 # Technical Provider Guide
 
-Megan's Daycare  
+Megan's Childcare
 Technical operations reference  
 Updated November 2026
 
-This guide is for the daycare's authorized technical operator. It covers local development, Cloudflare D1 operations, account recovery, backup and restore, and provider handoff. The repository is still an early prototype. No production infrastructure has been created, and real child or family data must not be entered until launch requirements are implemented and tested.
+This guide is for the childcare program's authorized technical operator. It covers local development, Cloudflare D1 operations, account recovery, backup and restore, and provider handoff. The repository is still an early prototype. No production infrastructure has been created, and real child or family data must not be entered until launch requirements are implemented and tested.
 
 ## System overview
 
@@ -46,7 +46,7 @@ The local test database was cleared before applying the family PIN redesign. Nev
 
 If the provider loses both password and recovery phrase after any remaining legacy codes are retired, there is no in-app recovery route. Do not create a permanent master password or edit credential rows manually. Use the secure paper attendance process while an authorized technical operator follows a controlled recovery process. Cloudflare account recovery does not recover an app account.
 
-Before production, run authentication tests, verify session expiration and revocation, confirm family authorization boundaries, and verify that PINs and recovery secrets are not exposed through API responses or logs. Keep recovery materials under daycare ownership.
+Before production, run authentication tests, verify session expiration and revocation, confirm family authorization boundaries, and verify that PINs and recovery secrets are not exposed through API responses or logs. Keep recovery materials under the childcare program's ownership.
 
 ## Provider dashboard operations
 
@@ -78,12 +78,12 @@ The CSV export omits account credentials, sessions, authorization links, and oth
 
 D1 Time Travel is automatic short-term recovery, not a six-year archive. As of November 2026, Cloudflare documents seven days of history on the Free plan and 30 days on the Paid plan. Confirm the current plan and limits before production. See [Cloudflare D1 Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/).
 
-Before production, the provider must approve a backup schedule and protected storage that supports the daycare's six-year retention plan. A monthly full export is a reasonable starting schedule for a single in-home daycare, subject to the provider's recordkeeping needs. Store exports on provider-controlled encrypted media, keep a second encrypted copy in a separate secure location, and record only backup metadata in the backup log. Do not retain unnecessary copies longer than the provider's approved retention policy.
+Before production, the provider must approve a backup schedule and protected storage that supports the childcare program's six-year retention plan. A monthly full export is a reasonable starting schedule for a single in-home childcare program, subject to the provider's recordkeeping needs. Store exports on provider-controlled encrypted media, keep a second encrypted copy in a separate secure location, and record only backup metadata in the backup log. Do not retain unnecessary copies longer than the provider's approved retention policy.
 
 Example Windows PowerShell export from the project folder. Replace the database name. Connect an encrypted provider-owned drive first.
 
 ```powershell
-$backupRoot = "E:\MeganDaycareBackups"
+$backupRoot = "E:\MeganChildcareBackups"
 $databaseName = "replace-with-provider-database-name"
 $stamp = Get-Date -Format "yyyyMMdd-HHmm"
 New-Item -ItemType Directory -Force -Path $backupRoot | Out-Null
@@ -118,11 +118,11 @@ Keep the previous bookmark returned by the restore command; Cloudflare documents
 
 ## Restore a full SQL export
 
-Restore only into a new, empty D1 database owned by the daycare. Never import a production export into the ordinary local development database. Production data must not be copied to a developer device or a development environment that is reserved for fictional data.
+Restore only into a new, empty D1 database owned by the childcare program. Never import a production export into the ordinary local development database. Production data must not be copied to a developer device or a development environment that is reserved for fictional data.
 
 ```powershell
 $databaseName = "replace-with-new-empty-provider-database-name"
-$backupFile = "E:\MeganDaycareBackups\attendance-YYYYMMDD-HHMM.sql"
+$backupFile = "E:\MeganChildcareBackups\attendance-YYYYMMDD-HHMM.sql"
 npx wrangler d1 execute $databaseName --remote --file $backupFile
 ```
 
@@ -130,7 +130,7 @@ Validate the imported database in a restricted provider-owned environment before
 
 ## Production handoff
 
-Before launch, confirm that the Cloudflare account, Worker, D1 database, domain, source repository, and recovery materials are owned by the daycare. The placeholder database ID in `wrangler.toml` must be replaced with the provider-owned database ID during authorized setup. Production secrets must be stored as Cloudflare secrets and must not be committed to Git.
+Before launch, confirm that the Cloudflare account, Worker, D1 database, domain, source repository, and recovery materials are owned by the childcare program. The placeholder database ID in `wrangler.toml` must be replaced with the provider-owned database ID during authorized setup. Production secrets must be stored as Cloudflare secrets and must not be committed to Git.
 
 Verify provider and family PIN login, family authorization boundaries, sign-in/out, corrections, provider-only downloads, CSV export, backup, and restore. Confirm provider password recovery is implemented and tested. Confirm the provider can administer families without developer access.
 

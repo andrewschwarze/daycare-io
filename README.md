@@ -1,6 +1,6 @@
-# Megan's Daycare Attendance
+# Megan's Childcare Attendance
 
-A mobile-first attendance app for one in-home daycare. Families use one shared six-digit PIN to access their linked children, while the provider manages attendance and family access.
+A mobile-first attendance app for one in-home childcare program. Families use one shared six-digit PIN to access their linked children, while the provider manages attendance and family access.
 
 > **Development status:** This is an early local implementation. Use fictional children and families only. Review authentication, backups, recovery, privacy, and deployment before entering real attendance data.
 
@@ -15,7 +15,7 @@ A mobile-first attendance app for one in-home daycare. Families use one shared s
 - Attendance is appended as events. Corrections are separate records with a reason and provider identity; original events remain in the database.
 - No email delivery, analytics, or third-party identity provider is used. Family PINs are displayed once to the provider when first generated or reset and should be shared privately.
 
-The intended hosting target is Cloudflare's free tiers at expected low usage, but $0 is not guaranteed. Check current quotas and pricing in an account owned by the daycare provider.
+The intended hosting target is Cloudflare's free tiers at expected low usage, but $0 is not guaranteed. Check current quotas and pricing in an account owned by the childcare provider.
 
 ## Local setup
 
@@ -63,7 +63,7 @@ The first provider account can add children and families. Save the provider's on
 
 ## Scope and limits
 
-CCAP compliance, electronic attendance submission, and state-specific reporting are out of scope. This app is for the daycare's own attendance operations. Provider policies and applicable licensing/privacy obligations should still be reviewed before real records are entered.
+CCAP compliance, electronic attendance submission, and state-specific reporting are out of scope. This app is for the childcare program's own attendance operations. Provider policies and applicable licensing/privacy obligations should still be reviewed before real records are entered.
 
 The dashboard activity feed shows the latest 500 events; CSV export includes the full attendance history. Date filtering is not yet available. The everyday provider instructions are in [docs/provider-guide.md](docs/provider-guide.md), and technical operations are in [docs/technical-provider-guide.md](docs/technical-provider-guide.md). The provider dashboard has authenticated links to both Word guides. Regenerate them from the Markdown sources with `python docs/build_provider_guides.py` after installing the optional `python-docx` package. Family PINs are shown only once when generated or reset. A provider who loses both the password and recovery phrase has no in-app recovery path. Backup and restore still need a provider-owned production setup and a successful restore drill. Attendance rows are not automatically purged; set an appropriate retention policy before production. Do not deploy publicly or enter real family information yet.
 

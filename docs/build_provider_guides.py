@@ -206,7 +206,7 @@ def build_one(source: Path, output: Path, subject: str) -> None:
 
     document.core_properties.title = headings[0][0] if headings else source.stem
     document.core_properties.subject = subject
-    document.core_properties.author = "Megan's Daycare"
+    document.core_properties.author = "Megan's Childcare"
     output.parent.mkdir(parents=True, exist_ok=True)
     document.save(output)
 
